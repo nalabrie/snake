@@ -354,7 +354,7 @@ if __name__ == "__main__":
     SCREEN_UPDATE = pygame.USEREVENT  # updates screen at time interval
     pygame.time.set_timer(SCREEN_UPDATE, 150)
 
-    # create game logic
+    # create instance of the game logic
     main_game = Main(screen)
 
     ready = False
@@ -380,8 +380,14 @@ if __name__ == "__main__":
 
     # game has begun
 
+    new_game = False  # starts a new game when True
     while True:
         # game loop, draw all elements here
+
+        if new_game:
+            # starts a new game by creating a fresh game logic instance
+            main_game = Main(screen)
+            new_game = False
 
         # check for user events
         for event in pygame.event.get():
@@ -416,6 +422,9 @@ if __name__ == "__main__":
                     if main_game.snake.direction != main_game.snake.RIGHT:
                         # safe to change direction
                         main_game.snake.direction = main_game.snake.LEFT
+                if event.key == pygame.K_r:
+                    # starts a new game when player presses 'r'
+                    new_game = True
 
         pygame.display.update()  # refresh game window
         clock.tick(FPS)  # limits framerate
