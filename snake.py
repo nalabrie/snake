@@ -28,7 +28,7 @@ class Fruit:
     """
 
     def __init__(self, starting_pos=Vector2(15, 10)):
-        # create random (x,y) position of fruit
+        # assign starting position of fruit
         self.pos = starting_pos
 
         # load fruit image
@@ -220,6 +220,8 @@ class Main:
 
     def __init__(self, surface):
         self.snake = Snake()
+        # store previous snake direction to prevent it from reversing
+        self.old_direction = self.snake.direction
         self.fruit = Fruit()
         self.game_font = pygame.font.Font(
             "Font/PoetsenOne-Regular.ttf", FONT_SIZE)
@@ -233,12 +235,18 @@ class Main:
         Updates the internal state of the game (as long as the game isn't over).
         """
         if not self.is_game_over:
+            if self.old_direction != -self.snake.direction:
+                # safe for snake to change direction
+                self.old_direction = self.snake.direction
+            else:
+                # not safe for snake to change direction, prevent it
+                self.snake.direction = self.old_direction
             self.snake.move_snake()
             self.check_collision()
 
     def draw_elements(self):
         """
-        Draws all items to the supplied pygame surface.
+        Draws all items to the main screen surface (as long as the game isn't over).
         """
         if not self.is_game_over:
             self.main_screen.fill(BACK_COLOR)
@@ -440,25 +448,17 @@ if __name__ == "__main__":
             if event.type == pygame.KEYDOWN:
                 # user pressed a key
                 if event.key == pygame.K_UP:
-                    # prevent snake from reversing
-                    if main_game.snake.direction != main_game.snake.DOWN:
-                        # safe to change direction
-                        main_game.snake.direction = main_game.snake.UP
+                    # attempt to change snake direction up
+                    main_game.snake.direction = main_game.snake.UP
                 if event.key == pygame.K_DOWN:
-                    # prevent snake from reversing
-                    if main_game.snake.direction != main_game.snake.UP:
-                        # safe to change direction
-                        main_game.snake.direction = main_game.snake.DOWN
+                    # attempt to change snake direction down
+                    main_game.snake.direction = main_game.snake.DOWN
                 if event.key == pygame.K_RIGHT:
-                    # prevent snake from reversing
-                    if main_game.snake.direction != main_game.snake.LEFT:
-                        # safe to change direction
-                        main_game.snake.direction = main_game.snake.RIGHT
+                    # attempt to change snake direction right
+                    main_game.snake.direction = main_game.snake.RIGHT
                 if event.key == pygame.K_LEFT:
-                    # prevent snake from reversing
-                    if main_game.snake.direction != main_game.snake.RIGHT:
-                        # safe to change direction
-                        main_game.snake.direction = main_game.snake.LEFT
+                    # attempt to change snake direction left
+                    main_game.snake.direction = main_game.snake.LEFT
                 if event.key == pygame.K_r:
                     # starts a new game when player presses 'r'
                     new_game = True
