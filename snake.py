@@ -1,5 +1,6 @@
 # made by very loosely following the tutorial made by 'Clear Code' at https://youtu.be/QFvqStqPCRU
 
+import pickle
 import sys
 from random import randint
 
@@ -225,6 +226,7 @@ class Main:
         self.score = 0  # player's score
         self.is_game_over = False
         self.main_screen = surface
+        self.load_high_scores()
 
     def update(self):
         """
@@ -268,12 +270,17 @@ class Main:
         Handles what happens when the snake dies and the game is over. Draws the game over messages onto the 'main_screen'.
         """
         self.is_game_over = True
+        self.update_high_scores()
+        self.save_high_scores()
 
-        # TODO: write high scores to a file and display them on the game over screen, using placeholders for now
         # store game over text, final score, and high scores to be displayed
         game_over_messages = [
-            "GAME OVER", "Final Score: " + str(self.score),
-            "HIGH SCORES", str(0), str(0), str(0), str(0), str(0)
+            "GAME OVER", "Final Score: " + str(self.score), "HIGH SCORES",
+            str(self.high_scores[0]),
+            str(self.high_scores[1]),
+            str(self.high_scores[2]),
+            str(self.high_scores[3]),
+            str(self.high_scores[4])
         ]
 
         # calculate (x,y) to place the first line of game over text
@@ -344,6 +351,37 @@ class Main:
                 if block == self.fruit.pos:
                     safe = False
 
+    def load_high_scores(self):
+        """
+        Loads a list of previous high scores from a file. If the file does not exist then a dummy list is used instead. The list always has a length of 5.
+        """
+        try:
+            with open("high_scores.pkl", "rb") as f:
+                self.high_scores = pickle.load(f)
+        except FileNotFoundError:
+            self.high_scores = [0, 0, 0, 0, 0]
+
+    def update_high_scores(self):
+        """
+        Updates and reverse-sorts the current list of high scores.
+        """
+        self.high_scores.sort(reverse=True)
+        if self.score > self.high_scores[-1]:
+            # new top 5 high score, replace smallest old high score and re-sort
+            self.high_scores[-1] = self.score
+            self.high_scores.sort(reverse=True)
+
+    def save_high_scores(self):
+        """
+        Saves the current list of high scores to a file.
+        """
+        try:
+            with open("high_scores.pkl", "wb") as f:
+                pickle.dump(self.high_scores, f, pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            # just print a warning to the console, it is ok if a high score file cannot be saved
+            print("warning: a high score file cannot be saved to disk due to an error")
+
 
 if __name__ == "__main__":
     # create pygame-related variables
@@ -401,7 +439,6 @@ if __name__ == "__main__":
                 main_game.draw_elements()  # update graphics
             if event.type == pygame.KEYDOWN:
                 # user pressed a key
-                # TODO: add a key to start a new game
                 if event.key == pygame.K_UP:
                     # prevent snake from reversing
                     if main_game.snake.direction != main_game.snake.DOWN:
