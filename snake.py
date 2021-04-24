@@ -13,8 +13,8 @@ WIDTH = CELL_NUMBER * CELL_SIZE
 HEIGHT = WIDTH
 FPS = 60
 FONT_SIZE = 25
-FONT_COLOR = (56, 74, 12)
 FONT_AA = True
+FONT_COLOR = (56, 74, 12)
 BACK_COLOR = (175, 215, 70)
 GRASS_COLOR = (167, 209, 61)
 # SNAKE_COLOR = (183, 111, 122)
@@ -214,32 +214,36 @@ class Snake:
 
 class Main:
     """
-    Main game logic class. Ensure that pygame has been initialized before using this class.
+    Main game logic class. The 'surface' argument is the main pygame surface to draw the game onto. Ensure that pygame has been initialized before using this class.
     """
 
-    def __init__(self):
+    def __init__(self, surface):
         self.snake = Snake()
         self.fruit = Fruit()
         self.game_font = pygame.font.Font(
             "Font/PoetsenOne-Regular.ttf", FONT_SIZE)
         self.score = 0  # player's score
+        self.is_game_over = False
+        self.main_screen = surface
 
     def update(self):
         """
-        Updates the internal state of the game.
+        Updates the internal state of the game (as long as the game isn't over).
         """
-        self.snake.move_snake()
-        self.check_collision()
+        if not self.is_game_over:
+            self.snake.move_snake()
+            self.check_collision()
 
-    def draw_elements(self, surface):
+    def draw_elements(self):
         """
-        Draws items to the supplied pygame surface.
+        Draws all items to the supplied pygame surface.
         """
-        surface.fill(BACK_COLOR)
-        self.draw_grass(surface)
-        self.fruit.draw_fruit(screen)
-        self.snake.draw_snake(screen)
-        self.draw_score(screen)
+        if not self.is_game_over:
+            self.main_screen.fill(BACK_COLOR)
+            self.draw_grass()
+            self.fruit.draw_fruit(self.main_screen)
+            self.snake.draw_snake(self.main_screen)
+            self.draw_score()
 
     def check_collision(self):
         """
@@ -261,15 +265,38 @@ class Main:
 
     def game_over(self):
         """
-        Handles what happens when the snake dies and the game is over.
+        Handles what happens when the snake dies and the game is over. Draws the game over messages onto the 'main_screen'.
         """
-        # TODO: just kills the game for now, change this later
-        pygame.quit()  # quit pygame
-        sys.exit()  # quit python
+        self.is_game_over = True
 
-    def draw_grass(self, surface):
+        # TODO: write high scores to a file and display them on the game over screen, using placeholders for now
+        # store game over text, final score, and high scores to be displayed
+        game_over_messages = [
+            "GAME OVER", "Final Score: " + str(self.score),
+            "HIGH SCORES", str(0), str(0), str(0), str(0), str(0)
+        ]
+
+        # calculate (x,y) to place the first line of game over text
+        x = WIDTH // 2
+        y = HEIGHT // 3
+
+        # loop through all messages to be drawn to the screen
+        for index, msg in enumerate(game_over_messages):
+            # render msg
+            message_surface = self.game_font.render(msg, FONT_AA, FONT_COLOR)
+            # place rect around msg
+            message_rect = message_surface.get_rect(center=(x, y))
+            # blit msg
+            self.main_screen.blit(message_surface, message_rect)
+            # offset y for next msg
+            y += CELL_SIZE
+            if index == 1:
+                # offset again to visually split the high score list
+                y += CELL_SIZE
+
+    def draw_grass(self):
         """
-        Draws the grass on the supplied surface (the game board) in a checkerboard pattern.
+        Draws the grass on the 'main_screen' (the game board) in a checkerboard pattern.
         """
         for row in range(CELL_NUMBER):
             if row % 2 == 0:
@@ -277,17 +304,19 @@ class Main:
                     if col % 2 == 0:
                         grass_rect = pygame.Rect(
                             col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                        pygame.draw.rect(surface, GRASS_COLOR, grass_rect)
+                        pygame.draw.rect(self.main_screen,
+                                         GRASS_COLOR, grass_rect)
             else:
                 for col in range(CELL_NUMBER):
                     if col % 2 == 1:
                         grass_rect = pygame.Rect(
                             col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                        pygame.draw.rect(surface, GRASS_COLOR, grass_rect)
+                        pygame.draw.rect(self.main_screen,
+                                         GRASS_COLOR, grass_rect)
 
-    def draw_score(self, surface):
+    def draw_score(self):
         """
-        Draws the player's score onto the supplied surface.
+        Draws the player's score onto the 'main_screen'.
         """
         # score is the length of the snake minus its starting length
         score_text = str(self.score)
@@ -301,7 +330,7 @@ class Main:
         score_rect = score_surface.get_rect(center=(x, y))
 
         # draw the score to the screen
-        surface.blit(score_surface, score_rect)
+        self.main_screen.blit(score_surface, score_rect)
 
     def safely_move_fruit(self):
         """
@@ -326,7 +355,7 @@ if __name__ == "__main__":
     pygame.time.set_timer(SCREEN_UPDATE, 150)
 
     # create game logic
-    main_game = Main()
+    main_game = Main(screen)
 
     ready = False
     while not ready:
@@ -343,7 +372,7 @@ if __name__ == "__main__":
                 # start game
                 ready = True
 
-        main_game.draw_elements(screen)
+        main_game.draw_elements()
 
         pygame.display.update()  # updates screen
         clock.tick(FPS)  # limits framerate
@@ -363,9 +392,10 @@ if __name__ == "__main__":
             if event.type == SCREEN_UPDATE:
                 # 'SCREEN_UPDATE' timer went off
                 main_game.update()  # update game state
-                main_game.draw_elements(screen)  # update graphics
+                main_game.draw_elements()  # update graphics
             if event.type == pygame.KEYDOWN:
                 # user pressed a key
+                # TODO: add a key to start a new game
                 if event.key == pygame.K_UP:
                     # prevent snake from reversing
                     if main_game.snake.direction != main_game.snake.DOWN:
