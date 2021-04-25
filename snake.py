@@ -8,6 +8,7 @@ import pygame
 from pygame.math import Vector2
 
 # global constants
+DEBUG = False
 CELL_SIZE = 40
 CELL_NUMBER = 20
 WIDTH = CELL_NUMBER * CELL_SIZE
@@ -234,26 +235,30 @@ class MainGame:
         """
         Updates the internal state of the game (as long as the game isn't over).
         """
-        if not self.is_game_over:
-            if self.old_direction != -self.snake.direction:
-                # safe for snake to change direction
-                self.old_direction = self.snake.direction
-            else:
-                # not safe for snake to change direction, prevent it
-                self.snake.direction = self.old_direction
-            self.snake.move_snake()
-            self.check_collision()
+        if self.is_game_over:
+            return
+
+        if self.old_direction != -self.snake.direction:
+            # safe for snake to change direction
+            self.old_direction = self.snake.direction
+        else:
+            # not safe for snake to change direction, prevent it
+            self.snake.direction = self.old_direction
+        self.snake.move_snake()
+        self.check_collision()
 
     def draw_elements(self):
         """
         Draws all items to the main screen surface (as long as the game isn't over).
         """
-        if not self.is_game_over:
-            self.main_screen.fill(BACK_COLOR)
-            self.draw_grass()
-            self.fruit.draw_fruit(self.main_screen)
-            self.snake.draw_snake(self.main_screen)
-            self.draw_score()
+        if self.is_game_over:
+            return
+
+        self.main_screen.fill(BACK_COLOR)
+        self.draw_grass()
+        self.fruit.draw_fruit(self.main_screen)
+        self.snake.draw_snake(self.main_screen)
+        self.draw_score()
 
     def check_collision(self):
         """
@@ -390,6 +395,24 @@ class MainGame:
             # just print a warning to the console, it is ok if a high score file cannot be saved
             print("warning: a high score file cannot be saved to disk due to an error")
 
+    def draw_debug(self, clock):
+        """
+        Draws debug messages to the main screen. Needs a pygame clock to calculate FPS. Does nothing when the game is over.
+        """
+        if self.is_game_over:
+            return
+
+        # draw current FPS
+        fps_text = "FFS: "
+        fps_value_text = str(round(clock.get_fps(), 1))
+        fps_surface = self.game_font.render(fps_text, FONT_AA, FONT_COLOR)
+        fps_value_surface = self.game_font.render(
+            fps_value_text, FONT_AA, FONT_COLOR)
+        fps_rect = fps_surface.get_rect(center=(40, 40))
+        fps_value_rect = fps_value_surface.get_rect(midleft=fps_rect.midright)
+        self.main_screen.blit(fps_surface, fps_rect)
+        self.main_screen.blit(fps_value_surface, fps_value_rect)
+
 
 def main():
     """
@@ -449,6 +472,9 @@ def main():
                 # 'SCREEN_UPDATE' timer went off
                 main_game.update()  # update game state
                 main_game.draw_elements()  # update graphics
+                if DEBUG:
+                    # draw debug messages
+                    main_game.draw_debug(clock)
             if event.type == pygame.KEYDOWN:
                 # user pressed a key
                 if event.key == pygame.K_UP:
