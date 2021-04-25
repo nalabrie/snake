@@ -398,6 +398,7 @@ def main():
     # create pygame-related variables
     pygame.mixer.pre_init(buffer=512)  # reduce sound delay (potentially)
     pygame.init()
+    pygame.display.set_caption("Snake")
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     SCREEN_UPDATE = pygame.USEREVENT  # updates screen at time interval
