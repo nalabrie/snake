@@ -213,7 +213,7 @@ class Snake:
         self.add_new_block = True
 
 
-class Main:
+class MainGame:
     """
     Main game logic class. The 'surface' argument is the main pygame surface to draw the game onto. Ensure that pygame has been initialized before using this class.
     """
@@ -391,7 +391,10 @@ class Main:
             print("warning: a high score file cannot be saved to disk due to an error")
 
 
-if __name__ == "__main__":
+def main():
+    """
+    Main method. Runs the game.
+    """
     # create pygame-related variables
     pygame.mixer.pre_init(buffer=512)  # reduce sound delay (potentially)
     pygame.init()
@@ -401,7 +404,7 @@ if __name__ == "__main__":
     pygame.time.set_timer(SCREEN_UPDATE, 150)
 
     # create instance of the game logic
-    main_game = Main(screen)
+    main_game = MainGame(screen)
 
     ready = False
     while not ready:
@@ -432,7 +435,7 @@ if __name__ == "__main__":
 
         if new_game:
             # starts a new game by creating a fresh game logic instance
-            main_game = Main(screen)
+            main_game = MainGame(screen)
             new_game = False
 
         # check for user events
@@ -465,3 +468,8 @@ if __name__ == "__main__":
 
         pygame.display.update()  # refresh game window
         clock.tick(FPS)  # limits framerate
+
+
+if __name__ == "__main__":
+    # run game
+    main()
