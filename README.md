@@ -18,7 +18,7 @@ This is the classic Snake game written in Python 3 using Pygame. It was made by 
 3. Extract the zip folder somewhere
 4. Run `snake.exe`
 
-These pre-packaged releases **only run on Windows 10 64-bit!** They are made with [PyInstaller](https://www.pyinstaller.org/) and do not require any prerequisites.
+These pre-packaged releases **only run on Windows!** They are made with [PyInstaller](https://www.pyinstaller.org/) and do not require any prerequisites.
 
 ### Manual Install
 
@@ -26,7 +26,7 @@ These pre-packaged releases **only run on Windows 10 64-bit!** They are made wit
 2. Download the `snake.py` script, `Font` folder, `Graphics` folder, and `Sound` folder (directory structure should look like it does below)
 3. Run the `snake.py` script in a Python 3 interpreter
 
-```
+```text
 .
 ├── Font
 │   └── PoetsenOne-Regular.ttf
@@ -53,10 +53,14 @@ These pre-packaged releases **only run on Windows 10 64-bit!** They are made wit
 
 ## Prerequisites
 
-I used
+I originally used:
 
 * Python 3.9.2
 * Pygame 2.0.1
-* SDL 2.0.14
+* SDL 2.0.14 (bundled with Pygame)
 
-Python 3 is required but older versions of Pygame and SDL may work. I did not test older versions. I also did not test Python 3.8 or older.
+I did not test any older versions of the listed software. Latest release is using:
+
+* Python 3.11.2
+* Pygame 2.3.0
+* SDL 2.24.2 (bundled with Pygame)

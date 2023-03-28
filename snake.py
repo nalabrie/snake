@@ -1,4 +1,4 @@
-# made by very loosely following the tutorial made by 'Clear Code' at https://youtu.be/QFvqStqPCRU
+# made by very loosely following the tutorial made by "Clear Code" at https://youtu.be/QFvqStqPCRU
 
 import pickle
 import sys
@@ -7,42 +7,49 @@ from random import randint
 import pygame
 from pygame.math import Vector2
 
-# global constants
+# ---- GLOBAL CONSTANTS ----
+
 DEBUG = False
 CELL_SIZE = 40
 CELL_NUMBER = 20
-WIDTH = CELL_NUMBER * CELL_SIZE
-HEIGHT = WIDTH
+WIDTH = CELL_NUMBER * CELL_SIZE  # screen width
+HEIGHT = WIDTH  # screen height
 FPS = 60
 FONT_SIZE = 25
-FONT_AA = True
+FONT_AA = True  # enable antialiasing for fonts
 FONT_COLOR = (56, 74, 12)
-BACK_COLOR = (175, 215, 70)
+BACK_COLOR = (175, 215, 70)  # screen background color
 GRASS_COLOR = (167, 209, 61)
-# SNAKE_COLOR = (183, 111, 122)
-# FRUIT_COLOR = (126, 166, 114)
 
+
+# ---- CLASSES ----
 
 class Fruit:
     """
-    The fruit that the snake tries to collect around the gameboard. Takes a 'Vector2' to be used as its starting position on the board. Ensure that pygame has been initialized before using this class.
+    The fruit that the snake tries to collect around the game board. Takes a 'Vector2' to be used as its starting
+    position on the board. Ensure that pygame has been initialized before using this class.
     """
 
+    # ---- FUNCTIONS ----
+
     def __init__(self, starting_pos=Vector2(15, 10)):
+        """
+        Initializes the Fruit class.
+        @param starting_pos: Starting "Vector2" position for the fruit.
+        """
         # assign starting position of fruit
         self.pos = starting_pos
 
         # load fruit image
-        self.apple_img = pygame.image.load(
-            "Graphics/apple.png").convert_alpha()
+        self.apple_img = pygame.image.load("Graphics/apple.png").convert_alpha()
 
     def draw_fruit(self, surface):
         """
         Draws the fruit object to the supplied pygame surface.
+        @param surface: Pygame "Surface" to draw onto.
         """
         # create a rectangle
-        fruit_rect = pygame.Rect(
-            self.pos.x * CELL_SIZE, self.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        fruit_rect = pygame.Rect(self.pos.x * CELL_SIZE, self.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
 
         # draw the apple image
         surface.blit(self.apple_img, fruit_rect)
@@ -50,7 +57,8 @@ class Fruit:
 
     def move_fruit(self):
         """
-        Moves the fruit to a random position on the board. Does not check if the fruit will be placed in an illegal position (inside the snake, for example). This must be handled elsewhere if desired.
+        Moves the fruit to a random position on the board. Does not check if the fruit will be placed in an illegal
+        position (inside the snake, for example). This must be handled elsewhere if desired.
         """
         self.pos = Vector2(randint(0, CELL_NUMBER - 1),
                            randint(0, CELL_NUMBER - 1))
@@ -58,15 +66,24 @@ class Fruit:
 
 class Snake:
     """
-    The snake that the player controls. Use the arrow keys to move. Ensure that pygame has been initialized before using this class.
+    The snake that the player controls. Use the arrow keys to move.
+    Ensure that pygame has been initialized before using this class.
     """
+
+    # ---- VARIABLES ----
+
     # movement direction constants
     RIGHT = Vector2(1, 0)
     LEFT = Vector2(-1, 0)
     UP = Vector2(0, -1)
     DOWN = Vector2(0, 1)
 
+    # ---- FUNCTIONS ----
+
     def __init__(self):
+        """
+        Initializes the Snake class.
+        """
         # list of the snake's body (placed in starting position)
         self.body = [Vector2(3, 10), Vector2(2, 10), Vector2(1, 10)]
 
@@ -82,51 +99,37 @@ class Snake:
         # load snake images
 
         # head images
-        self.head_up = pygame.image.load(
-            "Graphics/head_up.png").convert_alpha()
-        self.head_down = pygame.image.load(
-            "Graphics/head_down.png").convert_alpha()
-        self.head_right = pygame.image.load(
-            "Graphics/head_right.png").convert_alpha()
-        self.head_left = pygame.image.load(
-            "Graphics/head_left.png").convert_alpha()
+        self.head_up = pygame.image.load("Graphics/head_up.png").convert_alpha()
+        self.head_down = pygame.image.load("Graphics/head_down.png").convert_alpha()
+        self.head_right = pygame.image.load("Graphics/head_right.png").convert_alpha()
+        self.head_left = pygame.image.load("Graphics/head_left.png").convert_alpha()
 
         # tail images
-        self.tail_up = pygame.image.load(
-            "Graphics/tail_up.png").convert_alpha()
-        self.tail_down = pygame.image.load(
-            "Graphics/tail_down.png").convert_alpha()
-        self.tail_right = pygame.image.load(
-            "Graphics/tail_right.png").convert_alpha()
-        self.tail_left = pygame.image.load(
-            "Graphics/tail_left.png").convert_alpha()
+        self.tail_up = pygame.image.load("Graphics/tail_up.png").convert_alpha()
+        self.tail_down = pygame.image.load("Graphics/tail_down.png").convert_alpha()
+        self.tail_right = pygame.image.load("Graphics/tail_right.png").convert_alpha()
+        self.tail_left = pygame.image.load("Graphics/tail_left.png").convert_alpha()
 
         # body images
-        self.body_vertical = pygame.image.load(
-            "Graphics/body_vertical.png").convert_alpha()
-        self.body_horizontal = pygame.image.load(
-            "Graphics/body_horizontal.png").convert_alpha()
+        self.body_vertical = pygame.image.load("Graphics/body_vertical.png").convert_alpha()
+        self.body_horizontal = pygame.image.load("Graphics/body_horizontal.png").convert_alpha()
 
         # turning images
-        self.body_tr = pygame.image.load(
-            "Graphics/body_tr.png").convert_alpha()
-        self.body_tl = pygame.image.load(
-            "Graphics/body_tl.png").convert_alpha()
-        self.body_br = pygame.image.load(
-            "Graphics/body_br.png").convert_alpha()
-        self.body_bl = pygame.image.load(
-            "Graphics/body_bl.png").convert_alpha()
+        self.body_tr = pygame.image.load("Graphics/body_tr.png").convert_alpha()
+        self.body_tl = pygame.image.load("Graphics/body_tl.png").convert_alpha()
+        self.body_br = pygame.image.load("Graphics/body_br.png").convert_alpha()
+        self.body_bl = pygame.image.load("Graphics/body_bl.png").convert_alpha()
 
     def draw_snake(self, surface):
         """
         Draws the snake to the supplied pygame surface.
+        @param surface: Pygame "Surface" to draw onto.
         """
         # loop through each block in the snake's body list
         # also grab the index of each block
         for index, block in enumerate(self.body):
             # create a rectangle (for image positioning)
-            snake_rect = pygame.Rect(
-                block.x * CELL_SIZE, block.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            snake_rect = pygame.Rect(block.x * CELL_SIZE, block.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
 
             # find what direction snake is heading
             if index == 0:
@@ -175,6 +178,7 @@ class Snake:
                 else:
                     # this block must be a corner block
                     # calculate which corner block to use and blit it
+                    # @formatter:off
                     if (previous_block.x == -1 and next_block.y == -1) or (previous_block.y == -1 and next_block.x == -1):
                         surface.blit(self.body_tl, snake_rect)
                     elif (previous_block.x == -1 and next_block.y == 1) or (previous_block.y == 1 and next_block.x == -1):
@@ -183,15 +187,7 @@ class Snake:
                         surface.blit(self.body_tr, snake_rect)
                     elif (previous_block.x == 1 and next_block.y == 1) or (previous_block.y == 1 and next_block.x == 1):
                         surface.blit(self.body_br, snake_rect)
-
-        # # loop through each block in the snake's body list
-        # for block in self.body:
-        #     # create a rectangle
-        #     snake_rect = pygame.Rect(
-        #         block.x * CELL_SIZE, block.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-
-        #     # draw the rectangle
-        #     pygame.draw.rect(surface, SNAKE_COLOR, snake_rect)
+                    # @formatter:on
 
     def move_snake(self):
         """
@@ -216,16 +212,22 @@ class Snake:
 
 class MainGame:
     """
-    Main game logic class. The 'surface' argument is the main pygame surface to draw the game onto. Ensure that pygame has been initialized before using this class.
+    Main game logic class. The 'surface' argument is the main pygame surface to draw the game onto.
+    Ensure that pygame has been initialized before using this class.
     """
 
+    # ---- FUNCTIONS ----
+
     def __init__(self, surface):
+        """
+        Initializes the "MainGame" class.
+        @param surface: The main pygame "Surface" to draw the game onto
+        """
         self.snake = Snake()
         # store previous snake direction to prevent it from reversing
         self.old_direction = self.snake.direction
         self.fruit = Fruit()
-        self.game_font = pygame.font.Font(
-            "Font/PoetsenOne-Regular.ttf", FONT_SIZE)
+        self.game_font = pygame.font.Font("Font/PoetsenOne-Regular.ttf", FONT_SIZE)
         self.score = 0  # player's score
         self.is_game_over = False
         self.main_screen = surface
@@ -280,7 +282,8 @@ class MainGame:
 
     def game_over(self):
         """
-        Handles what happens when the snake dies and the game is over. Draws the game over messages onto the 'main_screen'.
+        Handles what happens when the snake dies and the game is over.
+        Draws the game over messages onto the 'main_screen'.
         """
         self.is_game_over = True
         self.update_high_scores()
@@ -322,17 +325,13 @@ class MainGame:
             if row % 2 == 0:
                 for col in range(CELL_NUMBER):
                     if col % 2 == 0:
-                        grass_rect = pygame.Rect(
-                            col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                        pygame.draw.rect(self.main_screen,
-                                         GRASS_COLOR, grass_rect)
+                        grass_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                        pygame.draw.rect(self.main_screen, GRASS_COLOR, grass_rect)
             else:
                 for col in range(CELL_NUMBER):
                     if col % 2 == 1:
-                        grass_rect = pygame.Rect(
-                            col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                        pygame.draw.rect(self.main_screen,
-                                         GRASS_COLOR, grass_rect)
+                        grass_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                        pygame.draw.rect(self.main_screen, GRASS_COLOR, grass_rect)
 
     def draw_score(self):
         """
@@ -366,10 +365,12 @@ class MainGame:
 
     def load_high_scores(self):
         """
-        Loads a list of previous high scores from a file. If the file does not exist then a dummy list is used instead. The list always has a length of 5.
+        Loads a list of previous high scores from a file.
+        If the file does not exist then a dummy list is used instead.
+        The list always has a length of 5.
         """
         try:
-            with open("high_scores.pkl", "rb") as f:
+            with open("high_scores.pkl", mode="rb") as f:
                 self.high_scores = pickle.load(f)
         except FileNotFoundError:
             self.high_scores = [0, 0, 0, 0, 0]
@@ -380,7 +381,7 @@ class MainGame:
         """
         self.high_scores.sort(reverse=True)
         if self.score > self.high_scores[-1]:
-            # new top 5 high score, replace smallest old high score and re-sort
+            # new top 5 high score, replace the smallest old high score and re-sort
             self.high_scores[-1] = self.score
             self.high_scores.sort(reverse=True)
 
@@ -389,15 +390,20 @@ class MainGame:
         Saves the current list of high scores to a file.
         """
         try:
-            with open("high_scores.pkl", "wb") as f:
+            with open("high_scores.pkl", mode="wb") as f:
                 pickle.dump(self.high_scores, f, pickle.HIGHEST_PROTOCOL)
-        except Exception:
+        except Exception as e:
             # just print a warning to the console, it is ok if a high score file cannot be saved
-            print("warning: a high score file cannot be saved to disk due to an error")
+            print("WARNING: a high score file cannot be saved to disk due to an unknown error")
+            print(f"Exception output:\n{e}")
 
     def draw_debug(self, clock):
         """
-        Draws debug messages to the main screen. Needs a pygame clock to calculate FPS. Does nothing when the game is over.
+        Draws debug messages to the main screen.
+        Needs a pygame clock to calculate FPS.
+        Does nothing when the game is over.
+        @param clock: A "pygame.time.Clock()" object.
+        @return: Returns "None" when the game is over.
         """
         if self.is_game_over:
             return
@@ -406,13 +412,14 @@ class MainGame:
         fps_text = "FFS: "
         fps_value_text = str(round(clock.get_fps(), 1))
         fps_surface = self.game_font.render(fps_text, FONT_AA, FONT_COLOR)
-        fps_value_surface = self.game_font.render(
-            fps_value_text, FONT_AA, FONT_COLOR)
+        fps_value_surface = self.game_font.render(fps_value_text, FONT_AA, FONT_COLOR)
         fps_rect = fps_surface.get_rect(center=(40, 40))
         fps_value_rect = fps_value_surface.get_rect(midleft=fps_rect.midright)
         self.main_screen.blit(fps_surface, fps_rect)
         self.main_screen.blit(fps_value_surface, fps_value_rect)
 
+
+# ---- MAIN ----
 
 def main():
     """
@@ -448,7 +455,7 @@ def main():
         main_game.draw_elements()
 
         pygame.display.update()  # updates screen
-        clock.tick(FPS)  # limits framerate
+        clock.tick(FPS)  # limits frame rate
     del ready
 
     # game has begun
@@ -494,7 +501,7 @@ def main():
                     new_game = True
 
         pygame.display.update()  # refresh game window
-        clock.tick(FPS)  # limits framerate
+        clock.tick(FPS)  # limits frame rate
 
 
 if __name__ == "__main__":
